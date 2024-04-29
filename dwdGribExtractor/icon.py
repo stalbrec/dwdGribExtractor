@@ -1,5 +1,5 @@
 import requests
-from collections import Iterable
+from collections.abc import Iterable
 import multiprocessing
 from datetime import datetime, timezone, timedelta
 from bz2 import decompress
