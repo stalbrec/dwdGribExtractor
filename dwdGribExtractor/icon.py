@@ -155,7 +155,8 @@ class ICON_D2:
 
         urls = []
         # TODO: Here we need not start from 0 but from the current hour, if I understand it correctly
-        # if the current run is older than 3 hours, we need to start from the current hour, until the new run is published
+        # if the current run is older than 3 hours, we need to start from the current hour,
+        # until the new run is published
         for h in range(hours):
 
             hStr = str(h).zfill(2)
@@ -351,7 +352,8 @@ class ICON_D2:
         for filePath in fileList:
             try:
                 os.remove(filePath)
-            except:
+            except BaseException as err:
                 print("Error while deleting file : ", filePath)
+                print(err)
 
         return data
