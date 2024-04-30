@@ -360,3 +360,130 @@ class ICON_D2:
                 print(err)
 
         return data
+
+
+class ICON_EU(ICON_D2):
+    """Class to retrieve ICON EU data from opendata.dwd.de.
+    The data is extracted from a nwp gribfile
+
+    Parameters
+    ----------
+    locations : dict
+        lat, lon in geographic coordinates as a dict for each location
+
+            .. code-block::
+
+                variables = ["aswdir_s", "aswdifd_s", "t_2m"]
+
+    forecastHours : int
+        The forecast hours for which the data is collected
+    run : string
+        The name of the run to load forecast. Possible values:
+        "00", "03", "06" ... "18", "21", "23"
+    tmpFp : string
+        The filepath to a folder where temporary files will be stored.
+
+    Properties
+    ----------
+    locations : dict
+        The locations to forecast
+    forecastHours : int
+        The number of forecast hours
+    currentRun : string
+        The hours as string of the current run
+    currentRunDateTime : datetime
+        The init datetime of the current run
+    """
+
+    def __init__(self, locations: dict, forecastHours: int, run: str = None, tmpFp: str = None) -> None:
+        super().__init__(locations, forecastHours, run, tmpFp)
+        self._src = "https://opendata.dwd.de/weather/nwp/icon-eu/grib/"
+
+    def _getCurrentRun(self, now_utc):
+        """Gets the number of the current run by current time.
+        Other than ICON-D2 for ICON-EU there are long runs (120h forecast - 00, 06, 12, 18)
+        and short runs (48h forecast - 03, 09, 15, 21).
+        The short runs are available 3 hours after initialization,
+        while the long runs are available 4 hours after initialization.
+
+        Parameters
+        ----------
+        now_utc : datetime
+            The current datetime
+
+        Returns
+        -------
+        string
+            The run hour as a string (00, 03, 06 ...)
+        """
+
+        h = now_utc.hour
+        run_hour = "00"
+
+        if h >= 4:
+            run_hour = "00"
+        if h >= 10:
+            run_hour = "06"
+        if h >= 16:
+            run_hour = "12"
+        if h >= 22 or h < 4:
+            run_hour = "18"
+
+        # if the forecast is less than 49 hours,
+        # we can use an intermediate short-run
+        if self._forecastHours < 49:
+            if h >= 6 and h < 10:
+                run_hour = "03"
+            if h >= 12 and h < 16:
+                run_hour = "09"
+            if h >= 18 and h < 22:
+                run_hour = "15"
+            if h >= 0 and h < 4:
+                run_hour = "21"
+
+        self._currentRun = run_hour
+
+        return run_hour
+
+    def createDownloadUrl(self, var):
+        """Creates the download urls
+
+        Parameters
+        ----------
+        var : string
+            The variable name
+
+        Returns
+        -------
+        list
+            List with urls
+        """
+
+        currentRun = self._currentRun
+        now_utc = datetime.now(timezone.utc)
+
+        if (currentRun == "21" and now_utc.hour < 4) or (currentRun == "18" and now_utc.hour < 6):
+            now_utc = now_utc - timedelta(days=1)
+
+        urlDate = now_utc.strftime("%Y%m%d")
+
+        url = "{src}{run}/{var}".format(src=self._src, var=var, run=self._currentRun)
+
+        hours = self._forecastHours
+
+        first_relevant_hour = now_utc.hour - int(currentRun)
+        if self._forecastHours is None:
+            hours = 120 - first_relevant_hour
+
+        urls = []
+
+        for h in range(first_relevant_hour, first_relevant_hour + hours):
+            hStr = str(h).zfill(2)
+            fileName = "icon-eu_europe_regular-lat-lon_single-level_{ds}{run}_0{h}_{var}.grib2.bz2".format(
+                h=hStr, run=currentRun, var=var.upper(), ds=urlDate
+            )
+            filePath = "{url}/{fn}".format(url=url, fn=fileName)
+
+            urls.append(filePath)
+
+        return urls
