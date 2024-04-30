@@ -226,8 +226,13 @@ class ICON_D2:
 
         ncFile = xr.open_dataset(fp, engine="cfgrib")
         ncVarName = self._getVarnameFromNcFile(ncFile)
-        stepValues = ncFile.step.values
         hasStepIndex = True
+        if hasattr(ncFile, "step"):
+            stepValues = ncFile.step.values
+        else:
+            # if the dataset has no step attribute, this means
+            # the dataset is a single forecast hour
+            stepValues = np.timedelta64(0, "h")
 
         if not isinstance(stepValues, Iterable):
             stepValues = [stepValues]
