@@ -150,15 +150,13 @@ class ICON_D2:
 
         hours = self._forecastHours
 
+        first_relevant_hour = now_utc.hour - int(currentRun)
         if self._forecastHours is None:
-            hours = 49
+            hours = 49 - first_relevant_hour
 
         urls = []
-        # TODO: Here we need not start from 0 but from the current hour, if I understand it correctly
-        # if the current run is older than 3 hours, we need to start from the current hour,
-        # until the new run is published
-        for h in range(hours):
 
+        for h in range(first_relevant_hour, first_relevant_hour + hours):
             hStr = str(h).zfill(2)
             fileName = "icon-d2_germany_regular-lat-lon_single-level_{ds}{run}_0{h}_2d_{var}.grib2.bz2".format(
                 h=hStr, run=currentRun, var=var, ds=urlDate
