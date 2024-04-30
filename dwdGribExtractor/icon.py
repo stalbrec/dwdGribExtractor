@@ -117,7 +117,7 @@ class ICON_D2:
             run_hour = "15"
         if h >= 20:
             run_hour = "18"
-        if h >= 24 or h < 2:
+        if h >= 23 or h < 2:
             run_hour = "21"
 
         self._currentRun = run_hour
@@ -141,7 +141,7 @@ class ICON_D2:
         currentRun = self._currentRun
         now_utc = datetime.now(timezone.utc)
 
-        if currentRun == "21":
+        if currentRun == "21" and now_utc.hour < 2:
             now_utc = now_utc - timedelta(days=1)
 
         urlDate = now_utc.strftime("%Y%m%d")
