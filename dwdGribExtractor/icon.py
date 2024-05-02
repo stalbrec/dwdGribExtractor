@@ -64,6 +64,9 @@ class ICON_D2:
             self._tmpFp = tmpFp
 
         self._forecastHours = forecastHours
+        if self._forecastHours is not None and self._forecastHours > 49:
+            raise ValueError("The ICON-D2 model only provides forecast data up to 49 hours.")
+
         self._locations = locations
         self._src = "https://opendata.dwd.de/weather/nwp/icon-d2/grib/"
 
@@ -398,6 +401,8 @@ class ICON_EU(ICON_D2):
     def __init__(self, locations: dict, forecastHours: int, run: str = None, tmpFp: str = None) -> None:
         super().__init__(locations, forecastHours, run, tmpFp)
         self._src = "https://opendata.dwd.de/weather/nwp/icon-eu/grib/"
+        if self._forecastHours > 120:
+            raise ValueError("The ICON-EU model only provides forecast data up to 120 hours.")
 
     def _getCurrentRun(self, now_utc):
         """Gets the number of the current run by current time.
