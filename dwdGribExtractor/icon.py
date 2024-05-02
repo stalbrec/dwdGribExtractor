@@ -53,7 +53,7 @@ class ICON_D2:
 
         if tmpFp is None:
 
-            p = "tmp/icond2/"
+            p = "tmp/icon/"
 
             self._tmpFp = p
 
