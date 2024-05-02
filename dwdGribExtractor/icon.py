@@ -152,11 +152,11 @@ class ICON_D2:
 
         first_relevant_hour = now_utc.hour - int(currentRun)
         if self._forecastHours is None:
-            hours = 49 - first_relevant_hour
+            hours = 48
 
         urls = []
 
-        for h in range(first_relevant_hour, first_relevant_hour + hours):
+        for h in range(first_relevant_hour, first_relevant_hour + hours + 1):
             hStr = str(h).zfill(2)
             fileName = "icon-d2_germany_regular-lat-lon_single-level_{ds}{run}_0{h}_2d_{var}.grib2.bz2".format(
                 h=hStr, run=currentRun, var=var, ds=urlDate
@@ -477,7 +477,7 @@ class ICON_EU(ICON_D2):
 
         urls = []
 
-        for h in range(first_relevant_hour, first_relevant_hour + hours):
+        for h in range(first_relevant_hour, first_relevant_hour + hours + 1):
             hStr = str(h).zfill(2)
             fileName = "icon-eu_europe_regular-lat-lon_single-level_{ds}{run}_0{h}_{var}.grib2.bz2".format(
                 h=hStr, run=currentRun, var=var.upper(), ds=urlDate
