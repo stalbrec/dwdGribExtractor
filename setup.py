@@ -24,12 +24,12 @@ setup(
     ],
     python_requires='>=3.11',
     install_requires=[
-        'requests',
-        'multiprocess',
-        'xarray',
-        'pandas',
-        'cfgrib',
-        'eccodes',
-        'netCDF4'
+        'requests>=2.31.0',
+        'multiprocess>=0.70.16',
+        'xarray>=2024.3.0',
+        'pandas>=2.2.2',
+        'cfgrib>=0.9.11.0',
+        'eccodes>=1.7.0',
+        'netCDF4>=1.6.5'
     ]
 )
